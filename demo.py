@@ -11,8 +11,11 @@ from fire import Fire
 import sys
 import cv2
 from pathlib import Path
+import os
 
 def read_mp4(fn):
+    if not os.path.exists(fn):
+        print(f"Filename {fn} does not exist")
     vidcap = cv2.VideoCapture(fn)
     frames = []
     while(vidcap.isOpened()):
@@ -78,7 +81,8 @@ def main(
     print('filename', filename)
     name = Path(filename).stem
     print('name', name)
-    
+    print('dir', os.getcwd())
+
     rgbs = read_mp4(filename)
     rgbs = np.stack(rgbs, axis=0) # S,H,W,3
     rgbs = rgbs[:,:,:,::-1].copy() # BGR->RGB
