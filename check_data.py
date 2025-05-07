@@ -11,6 +11,7 @@ def read_mp4(fn):
     vidcap = cv2.VideoCapture(fn)
     frames = []
     while (vidcap.isOpened()):
+        print(f"Frame")
         ret, frame = vidcap.read()
         if ret == False:
             break
