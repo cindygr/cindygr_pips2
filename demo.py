@@ -24,6 +24,7 @@ def read_mp4(fn):
             break
         frames.append(frame)
     vidcap.release()
+    print(f"Frames size {len(frames)}")
     return frames
 
 def run_model(model, rgbs, S_max=128, N=64, iters=16, sw=None):
