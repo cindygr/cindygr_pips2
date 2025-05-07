@@ -1,11 +1,5 @@
-import time
 import numpy as np
-import saverloader
-from nets.pips2 import Pips
-import utils.improc
-from utils.basic import print_, print_stats
 from fire import Fire
-import sys
 import cv2
 from pathlib import Path
 import os
