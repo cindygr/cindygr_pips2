@@ -8,7 +8,7 @@ import os
 def read_mp4(fn):
     if not os.path.exists(fn):
         print(f"Filename {fn} does not exist")
-    vidcap = cv2.VideoCapture(fn)
+    vidcap = cv2.VideoCapture(fn, cv2.CAP_ANY)
     frames = []
     while (vidcap.isOpened()):
         print(f"Frame")
