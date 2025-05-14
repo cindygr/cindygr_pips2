@@ -25,16 +25,16 @@ def read_data(path_name):
         im_name = f"im{indx}.png"
         im = cv2.imread(path_name + im_name)
         if im is not None:
-            images.append(im)
+            if indx > 7:
+                images.append(im)
         else:
             break
 
+    print(f"Found {len(images)} images")
     pts_2d = []
     with open(path_name + "pts.json", "r") as f:
         pts_2d = json.load(f)
 
-    while len(images) > 8:
-        images.remove(images[1])
     rgbs = np.stack(images)
 
     pts = np.array(pts_2d)
@@ -43,6 +43,7 @@ def read_data(path_name):
 
 
 def run_model(model, rgbs, pts, iters=16, sw=None, dev=None):
+    print(f"Device {dev}, model dev {model.device}")
     rgbs = rgbs.to(dev).float()  # B, S, C, H, W
 
     B, S, C, H, W = rgbs.shape
@@ -56,7 +57,7 @@ def run_model(model, rgbs, pts, iters=16, sw=None, dev=None):
     grid_x = 8 + grid_x.reshape(B, -1) / float(N_ - 1) * (W - 16)
     xy0 = torch.stack([grid_x, grid_y], dim=-1)  # B, N_*N_, 2
     pts_as_np = np.array(pts)
-    pts_xy = torch.tensor(pts_as_np, dtype=torch.float32).unsqueeze(0)
+    pts_xy = torch.tensor(pts_as_np, dtype=torch.float32, device=dev).unsqueeze(0)
     _, S, C, H, W = rgbs.shape
 
     # zero-vel init
@@ -93,20 +94,26 @@ def main(
         device_ids=[0],
 ):
     annot_name = "first_tree_annot"
-    path_start = "/Users/grimmc/"
+    path_start = "/Users/cindygrimm/"
     # path_start = "/Users/cindygrimm/"
     tree_path = path_start + "PycharmProjects/data/EnvyTree/"
     tree_name = "BP_R1_East_tree2"
     input_path = tree_path + tree_name + "/CalculatedData/pips2/input/"
     output_path = tree_path + tree_name + "/CalculatedData/pips2/output/"
 
+    print(f"Input path is {input_path}")
     rgbs, pts = read_data(input_path)
     # the idea in this file is to run the model on a demo video,
     # and return some visualizations
 
     torch.set_default_tensor_type(torch.FloatTensor)
-    dev = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    dev = "cpu"
+    if torch.cuda.is_available():
+        dev = torch.device("cuda:0")
+    elif torch.backends.mps.is_available():
+        dev = torch.device("mps")
 
+    print(f"Using device {dev}")
     exp_name = 'de00'  # copy from dev repo
 
     S_here, H, W, C = rgbs.shape
@@ -124,10 +131,10 @@ def main(
 
     global_step = 0
 
-    model = Pips(stride=8).to(dev)
+    model = Pips(stride=8, device=dev).to(dev)
     parameters = list(model.parameters())
     if init_dir:
-        _ = saverloader.load(init_dir, model)
+        _ = saverloader.load(init_dir, model, dev=dev)
     global_step = 0
     model.eval()
 

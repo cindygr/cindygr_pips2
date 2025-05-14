@@ -63,9 +63,11 @@ def extract_images_from_event_file(event_file, output_dir):
                     scalar_value = value.simple_value
                     print(f"Step: {step}, Tag: {tag}, Value: {scalar_value}")
                 elif value.HasField('image'):
+                    print(f"image: {value.tag}")
                     img = value.image
                     width = img.width
                     height = img.height
+                    print(f"width: {width}, height: {height}")
                     image_data = tf.image.decode_gif(img.encoded_image_string).numpy()
                     img_array = np.array(image_data)
                     for indx in range(0, img_array.shape[0]):
@@ -94,12 +96,14 @@ def extract_images_from_event_file(event_file, output_dir):
 
 
 if __name__ == '__main__':
-    event_file = "/Users/grimmc/PycharmProjects/cindy_pips2/logs_demo/camel_48_1024_de00_12:00:05/t/events.out.tfevents.1746471605.graf311-macpro.engr.oregonstate.edu"
-    output_dir = '/Users/grimmc/PycharmProjects/cindy_pips2/output/'
+    home_dir = "/Users/cindygrimm/PycharmProjects/cindygr_pips2/logs_demo/"
+    event_file = home_dir + "tree_short_48_1024_de00_15:25:41/t/events.out.tfevents.1747088741.10-249-96-89.wireless.oregonstate.edu"
+    output_dir = '/Users/cindygrimm/PycharmProjects/cindygr_pips2/logs_demo/'
 
     # save_images_from_event(fn=event_file, tag="camel", output_dir='/Users/grimmc/PycharmProjects/cindy_pips2/output/')
 
     extract_images_from_event_file(event_file=event_file, output_dir=output_dir)
+    """return
     for indx, img in enumerate(
             extract_images_from_event(event_file, ["topic", "images", "trajs_on_rgbs", "first_step"])):
         cv2.imwrite(f"foo{indx}.png", img)
@@ -107,3 +111,4 @@ if __name__ == '__main__':
 
         save_images_from_event("/Users/grimmc/PycharmProjects/cindy_pips2/logs_demo/camel_48_1024_de00_12:00:05",
                                tag="camel", output_dir='/Users/grimmc/PycharmProjects/cindy_pips2/output/')
+    """

@@ -411,7 +411,7 @@ class CorrBlock:
             self.corrs_pyramid.append(corrs)
 
 class Pips(nn.Module):
-    def __init__(self, stride=8):
+    def __init__(self, stride=8, device='cuda'):
         super(Pips, self).__init__()
 
         self.stride = stride
@@ -424,9 +424,10 @@ class Pips(nn.Module):
         self.fnet = BasicEncoder(output_dim=self.latent_dim, norm_fn='instance', dropout=0, stride=stride)
         self.delta_block = DeltaBlock(hidden_dim=self.hidden_dim, corr_levels=self.corr_levels, corr_radius=self.corr_radius)
         self.norm = nn.GroupNorm(1, self.latent_dim)
+        self.device=device
 
     def forward(self, trajs_e0, rgbs, iters=3, trajs_g=None, vis_g=None, valids=None, sw=None, feat_init=None, is_train=False, beautify=False):
-        total_loss = torch.tensor(0.0).cuda()
+        total_loss = torch.tensor(0.0).to(self.device)
 
         B,S,N,D = trajs_e0.shape
         assert(D==2)

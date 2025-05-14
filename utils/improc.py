@@ -615,6 +615,7 @@ class Summ_writer(object):
             if only_return:
                 return vis
             else:
+                print(f"Saving gif ")
                 return self.summ_gif(name, vis, blacken_zeros)
 
     def summ_rgb(self, name, ims, blacken_zeros=False, frame_id=None, only_return=False, halfres=False):
